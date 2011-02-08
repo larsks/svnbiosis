@@ -13,11 +13,8 @@ import app
 import ssh
 
 authz_template='''
-[groups]
-admin_users = %(admin_users)s
-
 [admin:/]
-@admin_users = rw
+%(user)s = rw
 '''
 
 postcommit_template='''#!/bin/sh
@@ -27,26 +24,21 @@ python -m svnbiosis.postcommit "$@"
 class Main(app.App):
     def create_parser(self):
         parser = super(Main, self).create_parser()
-        parser.add_option('-u', '--user', action='append')
+        parser.add_option('-k', '--key')
 
         return parser
 
     def handle_args(self, args):
         try:
-            (pubkey,) = args
+            (user,) = args
         except ValueError:
-            self.parser.error('Missing argument PUBKEY.')
+            self.parser.error('Missing argument USER.')
 
         main_log = logging.getLogger('svntool.init.main')
         os.umask(0022)
 
-        if not os.path.isfile(pubkey):
-            main_log.error('cannot access public key "%s".' % pubkey)
-            sys.exit(1)
-
-        user, ext = os.path.splitext(os.path.basename(pubkey))
-        if not ssh.isSafeUsername(user):
-            main_log.error('invalid username: %s' % user)
+        if self.opts.key and not os.path.isfile(self.opts.key):
+            main_log.error('cannot access public key "%s".' % self.opts.key)
             sys.exit(1)
 
         try:
@@ -54,11 +46,6 @@ class Main(app.App):
         except OSError, detail:
             main_log.error('unable to access instance directory: %s' % detail)
             sys.exit(1)
-
-        if self.opts.user:
-            admin_users = [user] + self.opts.user
-        else:
-            admin_users = [user]
 
         main_log.info('creating admin repository')
         os.mkdir('repositories')
@@ -84,12 +71,13 @@ class Main(app.App):
 
         keydir = os.path.join('admin', 'keydir')
         os.mkdir(keydir)
-        copy_file(pubkey, keydir)
+
+        if self.opts.key:
+            copy_file(self.opts.key, os.path.join(keydir, '%s.pub' % user))
 
         authz = os.path.join('admin', 'authz')
         fd = open(authz, 'a')
-        print >>fd, authz_template % dict(
-                admin_users = ','.join(admin_users))
+        print >>fd, authz_template % dict(user = user)
         fd.close()
 
         rc = subprocess.call(['svn', 'add'] + glob.glob('admin/*'))
