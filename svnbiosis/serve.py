@@ -4,7 +4,7 @@ import sys
 import app
 
 class Main(app.App):
-    def handle_args(self, parser, cfg, options, args):
+    def handle_args(self, args):
         try:
             (user,) = args
         except ValueError:
@@ -13,7 +13,7 @@ class Main(app.App):
         main_log = logging.getLogger('svntool.serve.main')
         os.umask(0022)
 
-        os.chdir(os.path.expanduser('~'))
+        os.chdir(self.opts.instancedir)
 
         os.execvp('svnserve', ['svnserve', '--config-file',
             'svnserve.conf', '-r', '.', '-t', '--tunnel-user', user])

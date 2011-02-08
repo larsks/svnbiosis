@@ -6,11 +6,12 @@ import fnmatch
 import shlex
 import re
 import tempfile
+import errno
 
 re_valid_user = re.compile(r'^[a-zA-Z][a-zA-Z0-9_.-]*(@[a-zA-Z][a-zA-Z0-9.-]*)?$')
-authorized_keys_template = ('command="svntool-serve %(user)s",no-port-forwarding,'
+authorized_keys_template = ('command="python -m svnbiosis.serve %(user)s",no-port-forwarding,'
               +'no-X11-forwarding,no-agent-forwarding,no-pty %(keytype)s '
-              +'%(keydata)s SVNTOOL:%(user)s')
+              +'%(keydata)s SVN:%(user)s')
 
 def isSafeUsername(user):
     match = re_valid_user.match(user)
@@ -56,7 +57,7 @@ def filterAuthorizedKeys(fd):
     for line in fd:
         line = line.strip()
 
-        if shlex.split(line)[-1].startswith('SVNTOOL:'):
+        if shlex.split(line)[-1].startswith('SVN:'):
             continue
         else:
             yield(line)
@@ -87,10 +88,6 @@ def writeAuthorizedKeys(path, keydir):
     finally:
         if infd is not None:
             infd.close()
+
     os.rename(tmp.name, path)
-
-
-if __name__ == '__main__':
-    keys = readKeys(sys.argv[1])
-    writeAuthorizedKeys(sys.argv[1], sys.argv[2])
 
