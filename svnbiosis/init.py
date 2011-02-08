@@ -74,11 +74,14 @@ class Main(app.App):
 
         keydir = os.path.join('admin', 'keydir')
         os.mkdir(keydir)
-
         if self.opts.key:
             copy_file(self.opts.key, os.path.join(keydir, '%s.pub' % user))
 
-        authz = os.path.join('admin', 'authz')
+        authz = os.path.join(self.opts.instancedir, 'admin', 'authz')
+        copy_file(
+                os.path.join(self.resourcedir, 'authz'),
+                authz)
+
         fd = open(authz, 'a')
         print >>fd, authz_template % dict(user = user)
         fd.close()
@@ -87,9 +90,8 @@ class Main(app.App):
         rc = subprocess.call(['svn', 'commit', '-m', 'initial commit',
             'admin'])
 
-        svnserve_conf = os.path.join(
-                os.path.dirname(resources.__file__), 'svnserve.conf')
-        copy_file(svnserve_conf, 
+        copy_file(
+                os.path.join(self.resourcedir, 'svnserve.conf'),
                 os.path.join(self.opts.instancedir, 'svnserve.conf'))
 
 if __name__ == '__main__':

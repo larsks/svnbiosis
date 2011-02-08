@@ -6,6 +6,8 @@ import optparse
 import logging
 import ConfigParser
 
+import resources
+
 class App (object):
 
     def run(class_):
@@ -23,6 +25,7 @@ class App (object):
         self.opts = opts
         self.cfg = cfg
         self.parser = parser
+        self.resourcedir = os.path.dirname(resources.__file__)
 
         self.fixup_paths()
         self.setup_logging()
