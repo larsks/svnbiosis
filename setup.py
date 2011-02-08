@@ -17,9 +17,9 @@ setup(
 
     entry_points = {
         'console_scripts': [
-            'svnbiosis-serve = svnbiosis.serve:Main.main',
-            'svnbiosis-post-commit = svnbiosis.postcommit:Main.main',
-            'svnbiosis-init = svnbiosis.init:Main.main',
+            'svnbiosis-serve = svnbiosis.serve:Main.run',
+            'svnbiosis-post-commit = svnbiosis.postcommit:Main.run',
+            'svnbiosis-init = svnbiosis.init:Main.run',
             ],
         },
 

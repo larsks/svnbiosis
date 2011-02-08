@@ -8,6 +8,11 @@ import ConfigParser
 
 class App (object):
 
+    def run(class_):
+        app = class_()
+        return app.main()
+    run = classmethod(run)
+
     def main(self):
         self.setup_basic_logging()
 
