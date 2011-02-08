@@ -9,6 +9,7 @@ import glob
 from distutils.dir_util import copy_tree
 from distutils.file_util import copy_file
 
+import resources
 import app
 import ssh
 
@@ -63,11 +64,13 @@ class Main(app.App):
             'file://%s/repositories/admin' % self.opts.instancedir,
             'admin'])
 
-        main_log.info('populating admin repository')
-        copy_tree(
-                os.path.join(self.opts.datadir, 'template'),
-                'admin',
-                verbose=True)
+        templatedir = os.path.join(self.opts.datadir, 'template')
+        if os.path.isdir(templatedir):
+            main_log.info('populating admin repository')
+            copy_tree(
+                    os.path.join(self.opts.datadir, 'template'),
+                    'admin',
+                    verbose=True)
 
         keydir = os.path.join('admin', 'keydir')
         os.mkdir(keydir)
@@ -84,7 +87,8 @@ class Main(app.App):
         rc = subprocess.call(['svn', 'commit', '-m', 'initial commit',
             'admin'])
 
-        svnserve_conf = os.path.join(self.opts.datadir, 'svnserve.conf')
+        svnserve_conf = os.path.join(
+                os.path.dirname(resources.__file__), 'svnserve.conf')
         copy_file(svnserve_conf, 
                 os.path.join(self.opts.instancedir, 'svnserve.conf'))
 

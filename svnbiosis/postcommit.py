@@ -54,6 +54,7 @@ class Main(app.App):
             rc = subprocess.call(['svnadmin', 'create', repodir])
 
         sshdir = os.path.join(instancedir, '.ssh')
+
         if not os.path.isdir(sshdir):
             os.mkdir(sshdir)
 

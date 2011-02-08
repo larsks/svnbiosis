@@ -23,6 +23,10 @@ setup(
             ],
         },
 
+    package_data={
+        'svnbiosis.resources': ['*']
+        },
+
     # templates need to be a real directory, for git init
     zip_safe=False,
 
