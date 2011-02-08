@@ -63,7 +63,7 @@ def filterAuthorizedKeys(fd):
             yield(line)
 
 def writeAuthorizedKeys(path, keydir):
-    tmp = tempfile.NamedTemporaryFile(delete=False,
+    tmpfd, tmpname = tempfile.mkstemp(
             dir=os.path.dirname(path))
 
     try:
@@ -78,16 +78,16 @@ def writeAuthorizedKeys(path, keydir):
         try:
             if infd is not None:
                 for line in filterAuthorizedKeys(infd):
-                    print >>tmp, line
+                    os.write(tmpfd, '%s\n' % line)
 
             keygen = readKeys(keydir)
             for line in generateAuthorizedKeys(keygen):
-                print >>tmp, line
+                os.write(tmpfd, '%s\n' % line)
         finally:
-            tmp.close()
+            os.close(tmpfd)
     finally:
         if infd is not None:
             infd.close()
 
-    os.rename(tmp.name, path)
+    os.rename(tmpname, path)
 
