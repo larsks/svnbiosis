@@ -35,10 +35,10 @@ def readKeys(keydir):
                 continue
 
             parts = shlex.split(line)
-            if parts[0].startswith('ssh-'):
+            if len(parts) > 1 and parts[0].startswith('ssh-'):
                 keytype = parts[0]
                 keydata = parts[1]
-            elif parts[1].startswith('ssh-'):
+            elif len(parts) > 2 and parts[1].startswith('ssh-'):
                 keytype = parts[1]
                 keydata = parts[2]
             else:

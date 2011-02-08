@@ -20,3 +20,6 @@ class Main(app.App):
         main_log.error('Cannot execute svnserve.')
         sys.exit(1)
 
+if __name__ == '__main__':
+    Main().main()
+
