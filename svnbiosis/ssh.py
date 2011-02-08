@@ -9,7 +9,7 @@ import tempfile
 import errno
 
 re_valid_user = re.compile(r'^[a-zA-Z][a-zA-Z0-9_.-]*(@[a-zA-Z][a-zA-Z0-9.-]*)?$')
-authorized_keys_template = ('command="python -m svnbiosis.serve %(user)s",no-port-forwarding,'
+authorized_keys_template = ('command="svnbiosis-serve %(user)s",no-port-forwarding,'
               +'no-X11-forwarding,no-agent-forwarding,no-pty %(keytype)s '
               +'%(keydata)s SVN:%(user)s')
 

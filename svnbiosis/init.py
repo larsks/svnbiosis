@@ -18,7 +18,7 @@ authz_template='''
 '''
 
 postcommit_template='''#!/bin/sh
-python -m svnbiosis.postcommit "$@"
+svnbiosis-post-commit "$@"
 '''
 
 class Main(app.App):
