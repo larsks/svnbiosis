@@ -11,7 +11,7 @@ setup(
     author = 'Lars Kellogg-Stedman',
     author_email = 'lars@seas.harvard.edu',
     description = 'software for hosting Subversion repositories',
-    long_description = open('README.rst', 'r').read(),
+    long_description = open('README.txt', 'r').read(),
     license = 'BSD',
     keywords = 'svn subversion scm version-control ssh',
 
