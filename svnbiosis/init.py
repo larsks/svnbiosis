@@ -84,6 +84,10 @@ class Main(app.App):
         rc = subprocess.call(['svn', 'commit', '-m', 'initial commit',
             'admin'])
 
+        svnserve_conf = os.path.join(self.opts.datadir, 'svnserve.conf')
+        copy_file(svnserve_conf, 
+                os.path.join(self.opts.instancedir, 'svnserve.conf'))
+
 if __name__ == '__main__':
     Main().main()
 

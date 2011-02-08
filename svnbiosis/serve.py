@@ -1,5 +1,6 @@
 import os
 import sys
+import logging
 
 import app
 
@@ -8,7 +9,7 @@ class Main(app.App):
         try:
             (user,) = args
         except ValueError:
-            parser.error('Missing argument USER.')
+            self.parser.error('Missing argument USER.')
 
         main_log = logging.getLogger('svnbiosis.serve.main')
         os.umask(0022)
@@ -16,7 +17,7 @@ class Main(app.App):
         os.chdir(self.opts.instancedir)
 
         os.execvp('svnserve', ['svnserve', '--config-file',
-            'svnserve.conf', '-r', '.', '-t', '--tunnel-user', user])
+            'svnserve.conf', '-r', 'repositories', '-t', '--tunnel-user', user])
         main_log.error('Cannot execute svnserve.')
         sys.exit(1)
 
