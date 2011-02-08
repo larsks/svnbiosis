@@ -19,7 +19,7 @@ class Main(app.App):
         except ValueError:
             self.parser.error('Missing arguments REPO and REV.')
 
-        main_log = logging.getLogger('svntool.postcommit.main')
+        main_log = logging.getLogger('svnbiosis.postcommit.main')
         os.umask(0022)
 
         instancedir = os.path.abspath(os.path.join(repo, '../../'))

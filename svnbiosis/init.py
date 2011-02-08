@@ -34,7 +34,7 @@ class Main(app.App):
         except ValueError:
             self.parser.error('Missing argument USER.')
 
-        main_log = logging.getLogger('svntool.init.main')
+        main_log = logging.getLogger('svnbiosis.init.main')
         os.umask(0022)
 
         if self.opts.key and not os.path.isfile(self.opts.key):

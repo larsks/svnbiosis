@@ -10,7 +10,7 @@ class Main(app.App):
         except ValueError:
             parser.error('Missing argument USER.')
 
-        main_log = logging.getLogger('svntool.serve.main')
+        main_log = logging.getLogger('svnbiosis.serve.main')
         os.umask(0022)
 
         os.chdir(self.opts.instancedir)

@@ -32,11 +32,11 @@ class App (object):
         parser = optparse.OptionParser()
         parser.add_option('--debug', action='store_true')
         parser.add_option('-d', '--instancedir',
-                default=os.environ.get('SVNTOOL_INSTANCE',
+                default=os.environ.get('SVNBIOSIS_INSTANCE',
                     os.environ.get('HOME', os.path.expanduser('~'))))
         parser.add_option('-D', '--datadir',
-                default=os.environ.get('SVNTOOL_DATADIR',
-                    '/usr/share/svntool'))
+                default=os.environ.get('SVNBIOSIS_DATADIR',
+                    '/usr/share/svnbiosis'))
         return parser
 
     def create_config(self):
@@ -54,7 +54,7 @@ class App (object):
             if self.opts.debug:
                 loglevel = 'DEBUG'
             else:
-                loglevel = self.cfg.get('svntool', 'loglevel')
+                loglevel = self.cfg.get('svnbiosis', 'loglevel')
         except (ConfigParser.NoSectionError,
                 ConfigParser.NoOptionError):
             pass
