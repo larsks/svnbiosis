@@ -9,6 +9,7 @@ import ConfigParser
 import resources
 
 class App (object):
+    logtag = 'svnbiosis.unknown.unknown'
 
     def run(class_):
         app = class_()
@@ -28,13 +29,29 @@ class App (object):
         self.resourcedir = os.path.dirname(resources.__file__)
 
         self.fixup_paths()
+        self.read_config()
         self.setup_logging()
+        self.setup_umask()
+
+        self.log.debug('finished generic setup')
 
         self.handle_args(args)
 
     def fixup_paths(self):
         self.opts.instancedir = os.path.abspath(self.opts.instancedir)
         self.opts.datadir = os.path.abspath(self.opts.datadir)
+        self.resourcedir = os.path.abspath(self.resourcedir)
+
+    def setup_umask(self):
+        try:
+            umask = int(self.cfg.get('svnbiosis', 'umask'), 8)
+        except (ConfigParser.NoSectionError,
+                ConfigParser.NoOptionError):
+            umask = 0022
+
+        self.log.debug('set umask to %04o.' % umask)
+        os.umask(umask)
+
 
     def create_parser(self):
         parser = optparse.OptionParser()
@@ -52,7 +69,9 @@ class App (object):
         return cfg
 
     def read_config(self):
-        self.cfg.read(self.opts.config)
+        cfgpath = os.path.join(self.opts.instancedir, 'admin',
+                'svnbiosis.conf')
+        self.cfg.read(cfgpath)
 
     def setup_basic_logging(self):
         logging.basicConfig()
@@ -76,6 +95,8 @@ class App (object):
                     )
             else:
                 logging.root.setLevel(symbolic)
+
+        self.log = logging.getLogger(self.logtag)
 
     def handle_args(self, args):
         pass

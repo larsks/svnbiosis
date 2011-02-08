@@ -23,6 +23,8 @@ svnbiosis-post-commit "$@"
 '''
 
 class Main(app.App):
+    logtag = 'svnbiosis.init'
+
     def create_parser(self):
         parser = super(Main, self).create_parser()
         parser.add_option('-k', '--key')
@@ -35,20 +37,19 @@ class Main(app.App):
         except ValueError:
             self.parser.error('Missing argument USER.')
 
-        main_log = logging.getLogger('svnbiosis.init.main')
-        os.umask(0022)
+        self.log.debug('running init for user: %s' % user)
 
         if self.opts.key and not os.path.isfile(self.opts.key):
-            main_log.error('cannot access public key "%s".' % self.opts.key)
+            self.log.error('cannot access public key "%s".' % self.opts.key)
             sys.exit(1)
 
         try:
             os.chdir(self.opts.instancedir)
         except OSError, detail:
-            main_log.error('unable to access instance directory: %s' % detail)
+            self.log.error('unable to access instance directory: %s' % detail)
             sys.exit(1)
 
-        main_log.info('creating admin repository')
+        self.log.info('creating admin repository')
         os.mkdir('repositories')
 
         adminrepo = os.path.join('repositories', 'admin')
@@ -66,7 +67,7 @@ class Main(app.App):
 
         templatedir = os.path.join(self.opts.datadir, 'template')
         if os.path.isdir(templatedir):
-            main_log.info('populating admin repository')
+            self.log.info('populating admin repository')
             copy_tree(
                     os.path.join(self.opts.datadir, 'template'),
                     'admin',

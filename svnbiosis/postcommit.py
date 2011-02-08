@@ -13,27 +13,31 @@ import ssh
 re_valid_repo = re.compile('^[\w\d]+$')
 
 class Main(app.App):
+    logtag = 'svnbiosis.post-commit'
+
     def handle_args(self, args):
         try:
             repo, rev = args
         except ValueError:
             self.parser.error('Missing arguments REPO and REV.')
 
-        main_log = logging.getLogger('svnbiosis.postcommit.main')
-        os.umask(0022)
-
         instancedir = os.path.abspath(os.path.join(repo, '../../'))
         admindir = os.path.join(instancedir, 'admin')
         reporoot = os.path.join(instancedir, 'repositories')
 
+        self.log.debug('starting post-commit for %s (via %s)' %
+                (instancedir, repo))
+
         try:
             os.chdir(admindir)
         except OSError, detail:
-            main_log.error('unable to access admin directory: %s' % detail)
+            self.log.error('unable to access admin directory: %s' % detail)
             sys.exit(1)
 
+        self.log.debug('updating active configuration from repository')
         rc = subprocess.call(['svn', '--non-interactive', 'update', '-q'])
 
+        self.log.debug('looking for new repositories')
         authz = ConfigParser.ConfigParser()
         authz.read('authz')
 
@@ -43,14 +47,14 @@ class Main(app.App):
 
             repo, path = sec.split(':')
             if not re_valid_repo.match(repo):
-                main_log.warning('invalid repo name: %s' % repo)
+                self.log.warning('invalid repo name: %s' % repo)
                 continue
 
             repodir = os.path.join(reporoot, repo)
             if os.path.isdir(repodir):
                 continue
 
-            main_log.info('creating new repository %s (%s)' % (repo, repodir))
+            self.log.info('creating new repository %s (%s)' % (repo, repodir))
             rc = subprocess.call(['svnadmin', 'create', repodir])
 
         sshdir = os.path.join(instancedir, '.ssh')
@@ -58,6 +62,7 @@ class Main(app.App):
         if not os.path.isdir(sshdir):
             os.mkdir(sshdir)
 
+        self.log.debug('rewriting authorized_keys file')
         ssh.writeAuthorizedKeys(
                 os.path.join(sshdir, 'authorized_keys'),
                 os.path.join(admindir, 'keydir'))
