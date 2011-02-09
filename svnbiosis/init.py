@@ -76,11 +76,7 @@ class Main(app.App):
                 target)
 
     def setup_repository(self, user):
-        keydir = os.path.join('admin', 'keydir')
-        os.mkdir(keydir)
-        if self.opts.key:
-            copy_file(self.opts.key,
-                    os.path.join(keydir, '%s.pub' % user))
+        self.setup_keys()
 
         authz = os.path.join(self.opts.instancedir, 'admin', 'authz')
         self.install_resource('authz', authz)
@@ -88,6 +84,16 @@ class Main(app.App):
         fd = open(authz, 'a')
         print >>fd, authz_template % dict(user = user)
         fd.close()
+
+        self.install_resource('svnbiosis.conf',
+                os.path.join(self.opts.instancedir, 'admin'))
+
+    def setup_keys(self):
+        keydir = os.path.join('admin', 'keydir')
+        os.mkdir(keydir)
+        if self.opts.key:
+            copy_file(self.opts.key,
+                    os.path.join(keydir, '%s.pub' % user))
 
     def install_template(self):
         templatedir = os.path.join(self.opts.datadir, 'template')
