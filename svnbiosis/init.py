@@ -1,6 +1,11 @@
 #!/usr/bin/python
 
 import os
+
+if not hasattr(os.path, 'relpath'):
+    import stupid
+    os.path.relpath = stupid.relpath
+
 import sys
 import logging
 import subprocess
