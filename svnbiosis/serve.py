@@ -13,8 +13,10 @@ class Main(app.App):
 
         os.chdir(self.opts.instancedir)
 
-        os.execvp('svnserve', ['svnserve', '--config-file',
-            'svnserve.conf', '-r', 'repositories', '-t', '--tunnel-user', user])
+        os.execvp('svnserve', ['svnserve', 
+            '-r', 'repositories',
+            '-t', '--tunnel-user', user])
+
         self.log.error('Cannot execute svnserve.')
         sys.exit(1)
 
