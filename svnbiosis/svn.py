@@ -41,6 +41,9 @@ class Repository (object):
         rc = subprocess.call(['svn', 'commit', '-m', message,
             self.wc])
 
+    def update(self):
+        rc = subprocess.call(['svn', '--non-interactive', 'update', '-q',
+            self.wc])
 
 def createRepository(repo, conf=None, hooks=None):
     rc = subprocess.call(['svnadmin', 'create', repo])

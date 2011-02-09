@@ -9,6 +9,7 @@ import re
 
 import app
 import ssh
+import svn
 
 re_valid_repo = re.compile('^[\w\d]+$')
 
@@ -21,51 +22,70 @@ class Main(app.App):
         except ValueError:
             self.parser.error('Missing arguments REPO and REV.')
 
-        instancedir = os.path.abspath(os.path.join(repo, '../../'))
-        admindir = os.path.join(instancedir, 'admin')
-        reporoot = os.path.join(instancedir, 'repositories')
+        self.instancedir = os.path.abspath(os.path.join(repo, '../../'))
+
+        admindir = os.path.join(self.instancedir, 'admin')
+        reporoot = os.path.join(self.instancedir, 'repositories')
 
         self.log.debug('starting post-commit for %s (via %s)' %
-                (instancedir, repo))
+                (self.instancedir, repo))
 
-        try:
-            os.chdir(admindir)
-        except OSError, detail:
-            self.log.error('unable to access admin directory: %s' % detail)
+        if not os.path.isdir(admindir):
+            self.log.error('unable to access admin directory (%s).' %
+                    admindir)
             sys.exit(1)
 
         self.log.debug('updating active configuration from repository')
-        rc = subprocess.call(['svn', '--non-interactive', 'update', '-q'])
+        admin = svn.Repository(
+                os.path.join(reporoot, 'admin'),
+                admindir)
+        admin.update()
 
-        self.log.debug('looking for new repositories')
-        authz = ConfigParser.ConfigParser()
-        authz.read('authz')
+        self.create_repositories()
+        self.update_keys()
 
-        for sec in authz.sections():
-            if not ':' in sec:
-                continue
-
-            repo, path = sec.split(':')
-            if not re_valid_repo.match(repo):
-                self.log.warning('invalid repo name: %s' % repo)
-                continue
-
-            repodir = os.path.join(reporoot, repo)
-            if os.path.isdir(repodir):
-                continue
-
-            self.log.info('creating new repository %s (%s)' % (repo, repodir))
-            rc = subprocess.call(['svnadmin', 'create', repodir])
-
-        sshdir = os.path.join(instancedir, '.ssh')
+    def update_keys(self):
+        sshdir = os.path.join(self.instancedir, '.ssh')
 
         if not os.path.isdir(sshdir):
+            self.log.debug('creating .ssh directory')
             os.mkdir(sshdir)
 
         self.log.debug('rewriting authorized_keys file')
         ssh.writeAuthorizedKeys(
                 os.path.join(sshdir, 'authorized_keys'),
-                os.path.join(admindir, 'keydir'))
+                os.path.join(self.instancedir, 'admin', 'keydir'))
+
+    def create_repositories(self):
+        self.log.debug('looking for new repositories')
+
+        authz = ConfigParser.ConfigParser()
+        authz.read(os.path.join(self.instancedir, 'admin', 'authz'))
+
+        for sec in authz.sections():
+            if not ':' in sec:
+                continue
+
+            reponame, path = sec.split(':')
+            if not re_valid_repo.match(reponame):
+                self.log.warning('invalid repo name: %s' % reponame)
+                continue
+
+            repodir = os.path.join(self.instancedir, 'repositories', reponame)
+            if os.path.isdir(repodir):
+                continue
+
+            self.log.info('creating new repository %s (%s)' % (reponame, repodir))
+            repo = svn.createRepository(repodir,
+                    conf = {
+                        'authz':
+                        os.path.relpath(
+                            os.path.join(self.instancedir, 'admin', 'authz'),
+                            os.path.join(repodir, 'conf')
+                            )
+                        }
+                    )
+
 
 if __name__ == '__main__':
     Main().main()
