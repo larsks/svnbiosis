@@ -76,7 +76,7 @@ class Main(app.App):
                 target)
 
     def setup_repository(self, user):
-        self.setup_keys()
+        self.setup_keys(user)
 
         authz = os.path.join(self.opts.instancedir, 'admin', 'authz')
         self.install_resource('authz', authz)
@@ -88,7 +88,7 @@ class Main(app.App):
         self.install_resource('svnbiosis.conf',
                 os.path.join(self.opts.instancedir, 'admin'))
 
-    def setup_keys(self):
+    def setup_keys(self, user):
         keydir = os.path.join('admin', 'keydir')
         os.mkdir(keydir)
         if self.opts.key:
