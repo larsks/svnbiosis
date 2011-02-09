@@ -12,14 +12,11 @@ from distutils.file_util import copy_file
 import resources
 import app
 import ssh
+import svn
 
-authz_template='''
+authz_template='''# Allow access for primary user.
 [admin:/]
 %(user)s = rw
-'''
-
-postcommit_template='''#!/bin/sh
-svnbiosis-post-commit "$@"
 '''
 
 class Main(app.App):
@@ -52,48 +49,52 @@ class Main(app.App):
         self.log.info('creating admin repository')
         os.mkdir('repositories')
 
-        adminrepo = os.path.join('repositories', 'admin')
-        postcommit_hook = os.path.join(adminrepo, 'hooks', 'post-commit')
+        repo = svn.createRepository(
+                os.path.join('repositories', 'admin'),
+                hooks = {
+                    'post-commit':
+                    os.path.join(self.resourcedir, 'post-commit')
+                    },
+                conf = {
+                    'authz':
+                    os.path.relpath(
+                        os.path.join('admin', 'authz'),
+                        os.path.join('repositories', 'admin', 'conf')
+                        )
+                    }
+                )
 
-        rc = subprocess.call(['svnadmin', 'create', adminrepo])
-        fd = open(postcommit_hook, 'w')
-        print >>fd, postcommit_template
-        fd.close()
-        os.chmod(postcommit_hook, 0755)
+        repo.checkout()
+        self.setup_repository(user)
+        self.install_template()
+        repo.add(glob.glob('admin/*'))
+        repo.commit('initial commit')
 
-        rc = subprocess.call(['svn', 'co', 
-            'file://%s/repositories/admin' % self.opts.instancedir,
-            'admin'])
+    def install_resource(self, src, target):
+        copy_file(
+                os.path.join(self.resourcedir, src),
+                target)
 
-        templatedir = os.path.join(self.opts.datadir, 'template')
-        if os.path.isdir(templatedir):
-            self.log.info('populating admin repository')
-            copy_tree(
-                    os.path.join(self.opts.datadir, 'template'),
-                    'admin',
-                    verbose=True)
-
+    def setup_repository(self, user):
         keydir = os.path.join('admin', 'keydir')
         os.mkdir(keydir)
         if self.opts.key:
-            copy_file(self.opts.key, os.path.join(keydir, '%s.pub' % user))
+            copy_file(self.opts.key,
+                    os.path.join(keydir, '%s.pub' % user))
 
         authz = os.path.join(self.opts.instancedir, 'admin', 'authz')
-        copy_file(
-                os.path.join(self.resourcedir, 'authz'),
-                authz)
+        self.install_resource('authz', authz)
 
         fd = open(authz, 'a')
         print >>fd, authz_template % dict(user = user)
         fd.close()
 
-        rc = subprocess.call(['svn', 'add'] + glob.glob('admin/*'))
-        rc = subprocess.call(['svn', 'commit', '-m', 'initial commit',
-            'admin'])
-
-        copy_file(
-                os.path.join(self.resourcedir, 'svnserve.conf'),
-                os.path.join(self.opts.instancedir, 'svnserve.conf'))
+    def install_template(self):
+        templatedir = os.path.join(self.opts.datadir, 'template')
+        if os.path.isdir(templatedir):
+            self.log.info('populating admin repository from template')
+            copy_tree(
+                    tempatedir, 'admin', verbose=True)
 
 if __name__ == '__main__':
     Main().main()
