@@ -5,6 +5,8 @@ import logging
 import app
 
 class Main(app.App):
+    logtag = 'svnbiosis.serve'
+
     def handle_args(self, args):
         try:
             (user,) = args
@@ -13,7 +15,9 @@ class Main(app.App):
 
         os.chdir(self.opts.instancedir)
 
+        self.log.info('starting server for user: %s' % user)
         os.execvp('svnserve', ['svnserve', 
+            '--log-file', '/tmp/svserve.log',
             '-r', 'repositories',
             '-t', '--tunnel-user', user])
 

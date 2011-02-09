@@ -60,7 +60,9 @@ class Main(app.App):
                     os.path.relpath(
                         os.path.join('admin', 'authz'),
                         os.path.join('repositories', 'admin', 'conf')
-                        )
+                        ),
+                    'svnserve.conf':
+                    os.path.join(self.resourcedir, 'svnserve.conf'),
                     }
                 )
 
