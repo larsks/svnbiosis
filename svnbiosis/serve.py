@@ -17,7 +17,6 @@ class Main(app.App):
 
         self.log.info('starting server for user: %s' % user)
         os.execvp('svnserve', ['svnserve', 
-            '--log-file', '/tmp/svserve.log',
             '-r', 'repositories',
             '-t', '--tunnel-user', user])
 
