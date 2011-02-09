@@ -2,7 +2,7 @@
 SVNBIOSIS
 =========
 
-Svnbiosis is a gitosis-alike for Subversion repositories.
+Svnbiosis (pronounced *svinbiosis*) is a gitosis-alike for Subversion repositories.
 
 Installation
 ============
