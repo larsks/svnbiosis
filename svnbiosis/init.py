@@ -94,7 +94,7 @@ class Main(app.App):
         if os.path.isdir(templatedir):
             self.log.info('populating admin repository from template')
             copy_tree(
-                    tempatedir, 'admin', verbose=True)
+                    templatedir, 'admin', verbose=True)
 
 if __name__ == '__main__':
     Main().main()
