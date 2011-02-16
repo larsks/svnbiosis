@@ -1,0 +1,4 @@
+#!/bin/sh
+
+svnbiosis-admin-post-commit "$@"
+

@@ -58,7 +58,7 @@ class Main(app.App):
                 os.path.join('repositories', 'admin'),
                 hooks = {
                     'post-commit':
-                    os.path.join(self.resourcedir, 'post-commit')
+                    os.path.join(self.resourcedir, 'admin-post-commit')
                     },
                 conf = {
                     'authz':

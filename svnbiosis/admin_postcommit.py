@@ -19,7 +19,7 @@ import svn
 re_valid_repo = re.compile('^[\w\d]+$')
 
 class Main(app.App):
-    logtag = 'svnbiosis.post-commit'
+    logtag = 'svnbiosis.admin-post-commit'
 
     def handle_args(self, args):
         try:
@@ -90,7 +90,11 @@ class Main(app.App):
                             ),
                         'svnserve.conf':
                         os.path.join(self.resourcedir, 'svnserve.conf'),
-                        }
+                        },
+                    hooks = {
+                        'post-commit':
+                        os.path.join(self.resourcedir, 'user-post-commit')
+                        },
                     )
 
 
