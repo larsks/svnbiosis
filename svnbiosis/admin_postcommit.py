@@ -16,7 +16,7 @@ import app
 import ssh
 import svn
 
-re_valid_repo = re.compile('^[\w\d]+$')
+re_valid_repo = re.compile('^[\w\d.-]+$')
 
 class Main(app.App):
     logtag = 'svnbiosis.admin-post-commit'
