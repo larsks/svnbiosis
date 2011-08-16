@@ -93,9 +93,9 @@ class Main(app.App):
                         },
                     hooks = {
                         'post-commit':
-                        os.path.join(self.resourcedir, 'user-post-commit')
+                        os.path.join(self.resourcedir, 'user-post-commit'),
                         'pre-revprop-change':
-                        os.path.join(self.resourcedir, 'user-pre-revprop-change')
+                        os.path.join(self.resourcedir, 'user-pre-revprop-change'),
                         },
                     )
 
