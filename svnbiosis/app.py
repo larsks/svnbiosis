@@ -59,7 +59,7 @@ class App (object):
             os.environ.get('HOME', os.path.expanduser('~')))
 
     def default_datadir(self):
-        default=os.environ.get('SVNBIOSIS_DATADIR',
+        return os.environ.get('SVNBIOSIS_DATADIR',
             '/usr/share/svnbiosis')
 
     def create_parser(self):
