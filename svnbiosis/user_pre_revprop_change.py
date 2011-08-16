@@ -40,7 +40,7 @@ class Main(hookscript.Main):
             sys.exit(0)
         else:
             print >>sys.stderr, 'Revision property changes are currently disabled.'
-            print >>sys.stderr, 'Set allow_revprop_changes=YES in svnbiosis.conf to enable.'
+            print >>sys.stderr, 'Set allow_revprop_change=YES in svnbiosis.conf to enable.'
             sys.exit(1)
 
     def create_config(self):
