@@ -41,7 +41,7 @@ class Main(app.App):
             sys.exit(1)
 
     def create_config(self):
-        cfg = super(app.app, self).create_config()
+        cfg = super(Main, self).create_config()
         cfg.set('DEFAULT', 'allow_revprop_change', 'NO')
         return cfg
 
