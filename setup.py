@@ -20,6 +20,7 @@ setup(
             'svnbiosis-serve = svnbiosis.serve:Main.run',
             'svnbiosis-admin-post-commit = svnbiosis.admin_postcommit:Main.run',
             'svnbiosis-user-post-commit = svnbiosis.user_postcommit:Main.run',
+            'svnbiosis-user-pre-revprop-change = svnbiosis.user_pre_revprop_change:Main.run',
             'svnbiosis-init = svnbiosis.init:Main.run',
             ],
         },
