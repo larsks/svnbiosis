@@ -25,7 +25,6 @@ class App (object):
 
         self.opts = opts
         self.cfg = cfg
-        self.parser = parser
         self.resourcedir = os.path.dirname(resources.__file__)
 
         self.fixup_paths()
