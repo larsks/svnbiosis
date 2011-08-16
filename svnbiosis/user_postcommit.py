@@ -15,10 +15,11 @@ import re
 import app
 import ssh
 import svn
+import hookscript
 
 re_valid_repo = re.compile('^[\w\d]+$')
 
-class Main(app.App):
+class Main(hookscript.Main):
     logtag = 'svnbiosis.post-commit-user'
 
     def handle_args(self, args):
@@ -27,16 +28,16 @@ class Main(app.App):
         except ValueError:
             self.parser.error('Missing arguments REPO and REV.')
 
-        self.instancedir = os.path.abspath(os.path.join(repo, '../../'))
+        self.opts.instancedir = os.path.abspath(os.path.join(repo, '../../'))
 
-        admindir = os.path.join(self.instancedir, 'admin')
-        reporoot = os.path.join(self.instancedir, 'repositories')
+        admindir = os.path.join(self.opts.instancedir, 'admin')
+        reporoot = os.path.join(self.opts.instancedir, 'repositories')
 
         self.log.debug('starting post-commit for %s (via %s)' %
-                (self.instancedir, repo))
+                (self.opts.instancedir, repo))
 
         self.run_script(
-                os.path.join(self.instancedir, 'hooks', 'post-commit'),
+                os.path.join(self.opts.instancedir, 'hooks', 'post-commit'),
                 repo, rev)
         self.run_script(
                 os.path.join(self.opts.datadir, 'hooks', 'post-commit'),

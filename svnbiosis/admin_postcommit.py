@@ -15,10 +15,11 @@ import re
 import app
 import ssh
 import svn
+import hookscript
 
 re_valid_repo = re.compile('^[\w\d.-]+$')
 
-class Main(app.App):
+class Main(hookscript.Main):
     logtag = 'svnbiosis.admin-post-commit'
 
     def handle_args(self, args):
@@ -27,13 +28,11 @@ class Main(app.App):
         except ValueError:
             self.parser.error('Missing arguments REPO and REV.')
 
-        self.instancedir = os.path.abspath(os.path.join(repo, '../../'))
-
-        admindir = os.path.join(self.instancedir, 'admin')
-        reporoot = os.path.join(self.instancedir, 'repositories')
+        admindir = os.path.join(self.opts.instancedir, 'admin')
+        reporoot = os.path.join(self.opts.instancedir, 'repositories')
 
         self.log.debug('starting post-commit for %s (via %s)' %
-                (self.instancedir, repo))
+                (self.opts.instancedir, repo))
 
         if not os.path.isdir(admindir):
             self.log.error('unable to access admin directory (%s).' %
@@ -50,7 +49,7 @@ class Main(app.App):
         self.update_keys()
 
     def update_keys(self):
-        sshdir = os.path.join(self.instancedir, '.ssh')
+        sshdir = os.path.join(self.opts.instancedir, '.ssh')
 
         if not os.path.isdir(sshdir):
             self.log.debug('creating .ssh directory')
@@ -59,13 +58,13 @@ class Main(app.App):
         self.log.debug('rewriting authorized_keys file')
         ssh.writeAuthorizedKeys(
                 os.path.join(sshdir, 'authorized_keys'),
-                os.path.join(self.instancedir, 'admin', 'keydir'))
+                os.path.join(self.opts.instancedir, 'admin', 'keydir'))
 
     def create_repositories(self):
         self.log.debug('looking for new repositories')
 
         authz = ConfigParser.ConfigParser()
-        authz.read(os.path.join(self.instancedir, 'admin', 'authz'))
+        authz.read(os.path.join(self.opts.instancedir, 'admin', 'authz'))
 
         for sec in authz.sections():
             if not ':' in sec:
@@ -76,7 +75,7 @@ class Main(app.App):
                 self.log.warning('invalid repo name: %s' % reponame)
                 continue
 
-            repodir = os.path.join(self.instancedir, 'repositories', reponame)
+            repodir = os.path.join(self.opts.instancedir, 'repositories', reponame)
             if os.path.isdir(repodir):
                 continue
 
@@ -85,7 +84,7 @@ class Main(app.App):
                     conf = {
                         'authz':
                         os.path.relpath(
-                            os.path.join(self.instancedir, 'admin', 'authz'),
+                            os.path.join(self.opts.instancedir, 'admin', 'authz'),
                             os.path.join(repodir, 'conf')
                             ),
                         'svnserve.conf':

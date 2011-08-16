@@ -19,8 +19,8 @@ class App (object):
     def main(self):
         self.setup_basic_logging()
 
-        parser = self.create_parser()
-        opts, args = parser.parse_args()
+        self.parser = self.create_parser()
+        opts, args = self.parse_args()
         cfg = self.create_config()
 
         self.opts = opts
@@ -37,6 +37,9 @@ class App (object):
 
         self.handle_args(args)
 
+    def parse_args(self):
+        return self.parser.parse_args()
+
     def fixup_paths(self):
         self.opts.instancedir = os.path.abspath(self.opts.instancedir)
         self.opts.datadir = os.path.abspath(self.opts.datadir)
@@ -52,16 +55,21 @@ class App (object):
         self.log.debug('set umask to %04o.' % umask)
         os.umask(umask)
 
+    def default_instancedir(self):
+        return os.environ.get('SVNBIOSIS_INSTANCE',
+            os.environ.get('HOME', os.path.expanduser('~'))))
+
+    def default_datadir(self):
+        default=os.environ.get('SVNBIOSIS_DATADIR',
+            '/usr/share/svnbiosis'))
 
     def create_parser(self):
         parser = optparse.OptionParser()
         parser.add_option('--debug', action='store_true')
         parser.add_option('-d', '--instancedir',
-                default=os.environ.get('SVNBIOSIS_INSTANCE',
-                    os.environ.get('HOME', os.path.expanduser('~'))))
+                default=self.default_instancedir())
         parser.add_option('-D', '--datadir',
-                default=os.environ.get('SVNBIOSIS_DATADIR',
-                    '/usr/share/svnbiosis'))
+                default=self.default_datadir())
         return parser
 
     def create_config(self):
