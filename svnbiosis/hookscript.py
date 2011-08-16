@@ -13,7 +13,7 @@ class Main(app.App):
         except IndexError:
             self.parser.error('Missing arguments REPO.')
 
-        self.opts.instancedir = os.path.abspath(os.path.join(repo, '../../'))
+        opts.instancedir = os.path.abspath(os.path.join(repo, '../../'))
 
         return opts, args
 
