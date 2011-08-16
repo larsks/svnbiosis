@@ -15,6 +15,7 @@ import re
 import app
 import ssh
 import svn
+import hookscript
 
 re_valid_repo = re.compile('^[\w\d]+$')
 
